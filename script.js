@@ -8,8 +8,19 @@ const recordButton = document.getElementById("record-button");
 const stopButton = document.getElementById("stop-button");
 const responseContainer = document.getElementById("response-container");
 const responseText = document.getElementById("response");
+const loader = document.getElementById("loader");
 
-// Audio recording management
+// Show loader
+function showLoader() {
+  loader.classList.remove("hidden");
+}
+
+// Hide loader
+function hideLoader() {
+  loader.classList.add("hidden");
+}
+
+// Handle audio recording
 recordButton.addEventListener("click", async () => {
   try {
     // Request microphone access
@@ -19,7 +30,7 @@ recordButton.addEventListener("click", async () => {
     mediaRecorder = new MediaRecorder(stream);
     mediaRecorder.start();
 
-    // Collect audio data
+    // Collect audio data chunks
     mediaRecorder.ondataavailable = (event) => {
       audioChunks.push(event.data);
     };
@@ -53,6 +64,9 @@ stopButton.addEventListener("click", () => {
     // Reset audio chunks
     audioChunks = [];
 
+    // Show loader
+    showLoader();
+
     // Send the audio file to the webhook
     try {
       const response = await fetch("https://hook.eu2.make.com/hynvat7x7zymjjz4d8es8q1wyco98q7i", {
@@ -62,16 +76,18 @@ stopButton.addEventListener("click", () => {
 
       if (!response.ok) throw new Error("Error analyzing the audio file.");
 
-      const result = await response.text();
-      responseText.textContent = result;
-      responseContainer.classList.remove("hidden");
+      // Wait for the final response from Make (assuming it returns JSON)
+      const result = await response.json();
+      displayResponse(result);
     } catch (error) {
       alert("Error: " + error.message);
+    } finally {
+      hideLoader();
     }
   };
 });
 
-// File upload management
+// Handle file upload
 document.getElementById("audio-upload-form").addEventListener("submit", async function (e) {
   e.preventDefault();
 
@@ -85,6 +101,9 @@ document.getElementById("audio-upload-form").addEventListener("submit", async fu
   const formData = new FormData();
   formData.append("audio_file", file);
 
+  // Show loader
+  showLoader();
+
   try {
     const response = await fetch("https://hook.eu2.make.com/hynvat7x7zymjjz4d8es8q1wyco98q7i", {
       method: "POST",
@@ -93,10 +112,19 @@ document.getElementById("audio-upload-form").addEventListener("submit", async fu
 
     if (!response.ok) throw new Error("Error analyzing the audio file.");
 
-    const result = await response.text();
-    responseText.textContent = result;
-    responseContainer.classList.remove("hidden");
+    // Wait for the final response from Make (assuming it returns JSON)
+    const result = await response.json();
+    displayResponse(result);
   } catch (error) {
     alert("Error: " + error.message);
+  } finally {
+    hideLoader();
   }
 });
+
+// Function to display the response
+function displayResponse(result) {
+  // Display the result in the response container
+  responseText.textContent = JSON.stringify(result, null, 2); // Prettify JSON for display
+  responseContainer.classList.remove("hidden");
+}
