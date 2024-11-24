@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reecap - Audio Insights</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Reecap</h1>
+    <p>Upload your audio file to get actionable insights on user interviews. Reecap helps you summarize key points, pain points, and suggestions.</p>
+
+    <!-- Form to upload audio -->
+    <form id="audio-upload-form">
+      <input type="file" id="audio-file" accept="audio/*" required />
+      <button type="submit" id="upload-button">Upload & Analyze</button>
+    </form>
+
+    <!-- Display the response -->
+    <div id="response-container">
+      <h2>Analysis Result</h2>
+      <div id="response"></div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
